@@ -18,7 +18,8 @@
 # 1. How to set multip-gpu in torch for training
 ############################################
 
-import os, sys
+import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/.")
@@ -225,7 +226,7 @@ def model_predictions(
         # set batch data
         batch_labels, batch_lengths = labelize(batch_clean_sentences, vocab)
         batch_idxs, batch_lengths_ = sclstm_tokenize(batch_corrupt_sentences, vocab)
-        assert (batch_lengths_ == batch_lengths).all() == True
+        assert (batch_lengths_ == batch_lengths).all() is True
         batch_idxs = [batch_idxs_.to(DEVICE) for batch_idxs_ in batch_idxs]
         batch_lengths = batch_lengths.to(DEVICE)
         batch_labels = batch_labels.to(DEVICE)
@@ -235,7 +236,8 @@ def model_predictions(
         # forward
         with torch.no_grad():
             """
-            NEW: batch_predictions can now be of shape (batch_size,batch_max_seq_len,topk) if topk>1, else (batch_size,batch_max_seq_len)
+            NEW: batch_predictions can now be of shape (batch_size,batch_max_seq_len,topk)
+                if topk>1, else (batch_size,batch_max_seq_len)
             """
             _, batch_predictions = model(
                 batch_idxs,
@@ -298,7 +300,7 @@ def model_predictions_for_ui(
         # set batch data
         batch_labels, batch_lengths = labelize(batch_clean_sentences, vocab)
         batch_idxs, batch_lengths_ = sclstm_tokenize(batch_corrupt_sentences, vocab)
-        assert (batch_lengths_ == batch_lengths).all() == True
+        assert (batch_lengths_ == batch_lengths).all() is True
         batch_idxs = [batch_idxs_.to(DEVICE) for batch_idxs_ in batch_idxs]
         batch_lengths = batch_lengths.to(DEVICE)
         batch_labels = batch_labels.to(DEVICE)
@@ -310,7 +312,8 @@ def model_predictions_for_ui(
             with torch.no_grad():
                 if not beam_search:
                     """
-                    NEW: batch_predictions can now be of shape (batch_size,batch_max_seq_len,topk) if topk>1, else (batch_size,batch_max_seq_len) if topk==1
+                    NEW: batch_predictions can now be of shape (batch_size,batch_max_seq_len,topk)
+                        if topk>1, else (batch_size,batch_max_seq_len) if topk==1
                     """
                     _, batch_predictions = model(
                         batch_idxs,
@@ -321,7 +324,8 @@ def model_predictions_for_ui(
                     )  # topk=1 or 5
                 else:
                     """
-                    NEW: batch_predictions can now be of shape (batch_size,batch_max_seq_len,topk) if topk==None
+                    NEW: batch_predictions can now be of shape (batch_size,batch_max_seq_len,topk)
+                        if topk==None
                     """
                     _, batch_predictions, batch_predictions_probs = model(
                         batch_idxs,
@@ -333,7 +337,10 @@ def model_predictions_for_ui(
                     )
         except RuntimeError:
             print(
-                f"batch_idxs:{len(batch_idxs)},batch_lengths:{batch_lengths.shape},batch_elmo_inp:{batch_elmo_inp.shape},batch_labels:{batch_labels.shape}"
+                (
+                    f"batch_idxs:{len(batch_idxs)},batch_lengths:{batch_lengths.shape},"
+                    f"batch_elmo_inp:{batch_elmo_inp.shape},batch_labels:{batch_labels.shape}"
+                )
             )
             raise Exception("")
 
@@ -399,7 +406,8 @@ def model_inference(
                 "when using beam_search, ***selected_lines_file*** arg is not used; no implementation"
             )
 
-    # list of dicts with keys {"id":, "original":, "noised":, "predicted":, "topk":, "topk_prediction_probs":, "topk_reranker_losses":,}
+    # list of dicts with keys {"id":, "original":, "noised":, "predicted":,
+    #   "topk":, "topk_prediction_probs":, "topk_reranker_losses":,}
     results = []
     line_index = 0
 
@@ -420,7 +428,7 @@ def model_inference(
         # set batch data
         batch_labels, batch_lengths = labelize(batch_clean_sentences, vocab)
         batch_idxs, batch_lengths_ = sclstm_tokenize(batch_corrupt_sentences, vocab)
-        assert (batch_lengths_ == batch_lengths).all() == True
+        assert (batch_lengths_ == batch_lengths).all() is True
         batch_idxs = [batch_idxs_.to(DEVICE) for batch_idxs_ in batch_idxs]
         batch_lengths = batch_lengths.to(DEVICE)
         batch_labels = batch_labels.to(DEVICE)
@@ -432,7 +440,8 @@ def model_inference(
             with torch.no_grad():
                 if not beam_search:
                     """
-                    NEW: batch_predictions can now be of shape (batch_size,batch_max_seq_len,topk) if topk>1, else (batch_size,batch_max_seq_len) if topk==1
+                    NEW: batch_predictions can now be of shape (batch_size,batch_max_seq_len,topk)
+                        if topk>1, else (batch_size,batch_max_seq_len) if topk==1
                     """
                     batch_loss, batch_predictions = model(
                         batch_idxs,
@@ -443,7 +452,8 @@ def model_inference(
                     )  # topk=1 or 5
                 else:
                     """
-                    NEW: batch_predictions can now be of shape (batch_size,batch_max_seq_len,topk) if topk==None
+                    NEW: batch_predictions can now be of shape (batch_size,batch_max_seq_len,topk)
+                        if topk==None
                     """
                     batch_loss, batch_predictions, batch_predictions_probs = model(
                         batch_idxs,
@@ -455,7 +465,10 @@ def model_inference(
                     )
         except RuntimeError:
             print(
-                f"batch_idxs:{len(batch_idxs)},batch_lengths:{batch_lengths.shape},batch_elmo_inp:{batch_elmo_inp.shape},batch_labels:{batch_labels.shape}"
+                (
+                    f"batch_idxs:{len(batch_idxs)},batch_lengths:{batch_lengths.shape},"
+                    f"batch_elmo_inp:{batch_elmo_inp.shape},batch_labels:{batch_labels.shape}"
+                )
             )
             raise Exception("")
         valid_loss += batch_loss
@@ -675,7 +688,10 @@ def model_inference(
             )
         )
         print(
-            f"corr2corr:{corr2corr}, corr2incorr:{corr2incorr}, incorr2corr:{incorr2corr}, incorr2incorr:{incorr2incorr}"
+            (
+                f"corr2corr:{corr2corr}, corr2incorr:{corr2incorr}, "
+                f"incorr2corr:{incorr2corr}, incorr2incorr:{incorr2incorr}"
+            )
         )
         print(
             f"accuracy is {(corr2corr+incorr2corr)/(corr2corr+corr2incorr+incorr2corr+incorr2incorr)}"
@@ -1099,7 +1115,7 @@ if __name__ == "__main__":
                 # set batch data
                 batch_labels, batch_lengths = labelize(batch_labels, vocab)
                 batch_idxs, batch_lengths_ = sclstm_tokenize(batch_sentences, vocab)
-                assert (batch_lengths_ == batch_lengths).all() == True
+                assert (batch_lengths_ == batch_lengths).all() is True
                 batch_idxs = [batch_idxs_.to(DEVICE) for batch_idxs_ in batch_idxs]
                 batch_lengths = batch_lengths.to(DEVICE)
                 batch_labels = batch_labels.to(DEVICE)
@@ -1158,7 +1174,10 @@ if __name__ == "__main__":
                     nb = int(np.ceil(len(train_data) / TRAIN_BATCH_SIZE))
                     progress_write_file.write(f"{batch_id+1}/{nb}\n")
                     progress_write_file.write(
-                        f"batch_time: {time.time()-st_time}, avg_batch_loss: {train_loss/(batch_id+1)}, avg_batch_acc: {train_acc/(batch_id+1)}\n"
+                        (
+                            f"batch_time: {time.time()-st_time}, avg_batch_loss: {train_loss/(batch_id+1)}, "
+                            f"avg_batch_acc: {train_acc/(batch_id+1)}\n"
+                        )
                     )
                     progress_write_file.flush()
             print(f"\nEpoch {epoch_id} train_loss: {train_loss/(batch_id+1)}")
@@ -1182,7 +1201,7 @@ if __name__ == "__main__":
                     # set batch data
                     batch_labels, batch_lengths = labelize(batch_labels, vocab)
                     batch_idxs, batch_lengths_ = sclstm_tokenize(batch_sentences, vocab)
-                    assert (batch_lengths_ == batch_lengths).all() == True
+                    assert (batch_lengths_ == batch_lengths).all() is True
                     batch_idxs = [batch_idxs_.to(DEVICE) for batch_idxs_ in batch_idxs]
                     batch_lengths = batch_lengths.to(DEVICE)
                     batch_labels = batch_labels.to(DEVICE)
@@ -1231,7 +1250,10 @@ if __name__ == "__main__":
                         nb = int(np.ceil(len(valid_data) / VALID_BATCH_SIZE))
                         progress_write_file.write(f"{batch_id}/{nb}\n")
                         progress_write_file.write(
-                            f"batch_time: {time.time()-st_time}, avg_batch_loss: {valid_loss/(batch_id+1)}, avg_batch_acc: {valid_acc/(batch_id+1)}\n"
+                            (
+                                f"batch_time: {time.time()-st_time}, avg_batch_loss: {valid_loss/(batch_id+1)}, "
+                                f"avg_batch_acc: {valid_acc/(batch_id+1)}\n"
+                            )
                         )
                         progress_write_file.flush()
                 print(f"\nEpoch {epoch_id} valid_loss: {valid_loss/(batch_id+1)}")
@@ -1241,7 +1263,7 @@ if __name__ == "__main__":
 
                     # to file
                     # name = "model-epoch{}.pth.tar".format(epoch_id)
-                    name = "model.pth.tar".format(epoch_id)
+                    name = "model.pth.tar"  # .format(epoch_id)
                     torch.save(
                         {
                             "epoch_id": epoch_id,
@@ -1267,7 +1289,7 @@ if __name__ == "__main__":
                 temp_folder = os.path.join(CHECKPOINT_PATH, "temp")
                 if not os.path.exists(temp_folder):
                     os.makedirs(temp_folder)
-                name = "model.pth.tar".format(epoch_id)
+                name = "model.pth.tar"  # .format(epoch_id)
                 torch.save(
                     {
                         "epoch_id": epoch_id,
@@ -1299,9 +1321,11 @@ if __name__ == "__main__":
         TRAIN_TEST_FILE_PATH1 = os.path.join(BASE_PATH, "traintest")
         TRAIN_TEST_FILE_PATH2 = os.path.join(BASE_PATH, "traintest/wo_context")
         """
-        paths = [TRAIN_TEST_FILE_PATH1,TRAIN_TEST_FILE_PATH1,TRAIN_TEST_FILE_PATH1,TRAIN_TEST_FILE_PATH2,TRAIN_TEST_FILE_PATH2,TRAIN_TEST_FILE_PATH2]
+        paths = [TRAIN_TEST_FILE_PATH1,TRAIN_TEST_FILE_PATH1,TRAIN_TEST_FILE_PATH1,
+            TRAIN_TEST_FILE_PATH2,TRAIN_TEST_FILE_PATH2,TRAIN_TEST_FILE_PATH2]
         files1 = ["test.bea60k","test.1blm","test.1blm","combined_data","aspell_big","aspell_small"]
-        files2 = ["test.bea60k.noise","test.1blm.noise.prob","test.1blm.noise.word","combined_data.noise","aspell_big.noise","aspell_small.noise"]
+        files2 = ["test.bea60k.noise","test.1blm.noise.prob","test.1blm.noise.word",
+            "combined_data.noise","aspell_big.noise","aspell_small.noise"]
         INFER_BATCH_SIZE = 16
         """
         """
@@ -1401,7 +1425,8 @@ if __name__ == "__main__":
         INFER_BATCH_SIZE = 8
         ANALYSIS_DIR = f"../seq_modeling_analysis/elmoscrnn/analysis_{TRAIN_NOISE_TYPE}_ambiguous_natural_v7"
         selected_lines_file = None
-        # expect a dict as {"id":, "original":, "noised":, "predicted":, "topk":, "topk_prediction_probs":, "topk_reranker_losses":,}
+        # expect a dict as {"id":, "original":, "noised":, "predicted":, "topk":,
+        #   "topk_prediction_probs":, "topk_reranker_losses":,}
         for x, y, z in zip(paths, files1, files2):
             print("\n\n\n\n")
             print(x, y, z)
@@ -1416,7 +1441,8 @@ if __name__ == "__main__":
                 beam_search=False,
                 selected_lines_file=selected_lines_file,
             )
-            # beam_search_results = model_inference(model,test_data,topk=10,DEVICE=DEVICE,BATCH_SIZE=INFER_BATCH_SIZE,beam_search=True)
+            # beam_search_results = model_inference(model,test_data,topk=10,DEVICE=DEVICE,
+            #   BATCH_SIZE=INFER_BATCH_SIZE,beam_search=True)
 
         print(ANALYSIS_DIR)
         if not os.path.exists(ANALYSIS_DIR):
@@ -1518,8 +1544,10 @@ if __name__ == "__main__":
         opfile.close()
 
         # print("beam_search...")
-        # beam_search_lines_fully_correct = {line["id"]:"" for line in beam_search_results if line["original"]==line["predicted"]}
-        # beam_search_lines_otherwise = {line["id"]:"" for line in beam_search_results if line["original"]!=line["predicted"]}
+        # beam_search_lines_fully_correct = {line["id"]:"" for line in beam_search_results
+        #   if line["original"]==line["predicted"]}
+        # beam_search_lines_otherwise = {line["id"]:"" for line in beam_search_results
+        #   if line["original"]!=line["predicted"]}
         # print(f'# Lines Predicted Fully Correct: {len(beam_search_lines_fully_correct)}')
         # print(f'# Lines Otherwise: {len(beam_search_lines_otherwise)}')
         # opfile = jsonlines.open(os.path.join(ANALYSIS_DIR,"beam_search_results.jsonl"),'w')
@@ -1538,7 +1566,8 @@ if __name__ == "__main__":
         # incorr2corr = len([k for k in greedy_lines_otherwise if k in beam_search_lines_fully_correct])
         # incorr2incorr = len([k for k in greedy_lines_otherwise if k in beam_search_lines_otherwise])
         # print("Confusion Matrix for before and after beam search: ")
-        # print(f"corr2corr:{corr2corr}, corr2incorr:{corr2incorr}, incorr2corr:{incorr2corr}, incorr2incorr:{incorr2incorr}")
+        # print(f"corr2corr:{corr2corr}, corr2incorr:{corr2incorr}, incorr2corr:{incorr2corr},
+        #   incorr2incorr:{incorr2incorr}")
 
 
 #########################################
@@ -1568,7 +1597,8 @@ if __name__ == "__main__":
 #             losses = []
 #             for sent in [k_batch_predictions[k][b] for k in range(topk)]:
 #                 if sent!="" or sent is not None:
-#                     input_ids = torch.tensor(gpt2Tokenizer.encode(sent, add_special_tokens=True)).unsqueeze(0)  # Batch size 1
+#                     input_ids = torch.tensor(gpt2Tokenizer.encode(sent,
+#                       add_special_tokens=True)).unsqueeze(0)  # Batch size 1
 #                     input_ids = input_ids.to(DEVICE)
 #                     outputs = gpt2LMHeadModel(input_ids, labels=input_ids)
 #                     loss = outputs[0].item()
@@ -1590,7 +1620,8 @@ if __name__ == "__main__":
 # incorr2corr+=incorr2corr_
 # incorr2incorr+=incorr2incorr_
 
-# this_batch = [[k_batch_predictions[k][i] for k in range(len(k_batch_predictions))] for i in range(len(k_batch_predictions[0]))]
+# this_batch = [[k_batch_predictions[k][i] for k in range(len(k_batch_predictions))]
+#   for i in range(len(k_batch_predictions[0]))]
 # flat_batch = sum(this_batch,[]); # print(flat_batch); print(len(flat_batch))
 # lens = [len(s) for s in this_batch]
 # ii = 0
@@ -1604,7 +1635,8 @@ if __name__ == "__main__":
 #             curr_inputs = gpt2Tokenizer.batch_encode_plus(curr_batch,pad_to_max_length=True)
 #             curr_inputs_ids = curr_inputs["input_ids"]
 #             curr_inputs = {k:torch.tensor(v).to(DEVICE) for k,v in curr_inputs.items()}
-#             curr_outputs = gpt2LMHeadModel(input_ids=curr_inputs["input_ids"],token_type_ids=curr_inputs["token_type_ids"],attention_mask=curr_inputs["attention_mask"])
+#             curr_outputs = gpt2LMHeadModel(input_ids=curr_inputs["input_ids"],
+#               token_type_ids=curr_inputs["token_type_ids"],attention_mask=curr_inputs["attention_mask"])
 #             lm_logits = curr_outputs[0]
 #             labels = torch.tensor([[i if i!=50256 else -100 for i in row] for row in curr_inputs_ids]).to(DEVICE)
 #             # Shift so that tokens < n predict n
@@ -1637,7 +1669,8 @@ if __name__ == "__main__":
 # incorr2incorr+=incorr2incorr_
 ##########################################################
 
-# for i, (a,b,c,d) in enumerate(zip(batch_clean_sentences_,batch_corrupt_sentences_,reranked_batch_predictions,batch_predictions_k)):
+# for i, (a,b,c,d) in enumerate(zip(batch_clean_sentences_,batch_corrupt_sentences_,
+#   reranked_batch_predictions,batch_predictions_k)):
 #     if a==c: # right
 #         line_index_right_opfile.write(f"{line_index+i}\t{a}\t{b}\t{c}\n")
 #     else:
