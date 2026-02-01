@@ -6,9 +6,9 @@ import jamspell
 from tqdm import tqdm
 
 sys.path.append("/..")
-from scripts.seq_modeling.helpers import load_data
-from commons import spacy_tokenizer
-from scripts.evals import get_metrics
+from scripts.seq_modeling.helpers import load_data  # noqa: E402
+from commons import spacy_tokenizer  # noqa: E402
+from scripts.evals import get_metrics  # noqa: E402
 
 """ corrector module """
 
@@ -68,7 +68,10 @@ class JamspellChecker:
                 )
             )
             print(
-                f"corr2corr:{corr2corr}, corr2incorr:{corr2incorr}, incorr2corr:{incorr2corr}, incorr2incorr:{incorr2incorr}"
+                (
+                    f"corr2corr:{corr2corr}, corr2incorr:{corr2incorr}, "
+                    f"incorr2corr:{incorr2corr}, incorr2incorr:{incorr2incorr}"
+                )
             )
             print(
                 f"accuracy is {(corr2corr + incorr2corr) / (corr2corr + corr2incorr + incorr2corr + incorr2incorr)}"
