@@ -1,3 +1,4 @@
+from .commons import DEFAULT_TRAINTEST_DATA_PATH
 from typing import List
 
 from .corrector import Corrector
