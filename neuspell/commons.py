@@ -12,7 +12,9 @@ if not os.path.exists(DEFAULT_DATA_PATH):
 
 DEFAULT_TRAINTEST_DATA_PATH = os.path.join(DEFAULT_DATA_PATH, "traintest")
 
-ALLENNLP_ELMO_PRETRAINED_FOLDER = os.path.join(DEFAULT_DATA_PATH, "allennlp_elmo_pretrained")
+ALLENNLP_ELMO_PRETRAINED_FOLDER = os.path.join(
+    DEFAULT_DATA_PATH, "allennlp_elmo_pretrained"
+)
 
 """ special tokenizers """
 
@@ -27,7 +29,9 @@ def _load_spacy_tokenizer():
             if not is_module_available("en_core_web_sm"):
                 raise ImportError("run `python -m spacy download en_core_web_sm`")
             print("creating spacy models ...")
-            spacy_nlp = get_module_or_attr("en_core_web_sm").load(disable=["tagger", "ner", "lemmatizer"])
+            spacy_nlp = get_module_or_attr("en_core_web_sm").load(
+                disable=["tagger", "ner", "lemmatizer"]
+            )
             _SPACY_TOKENIZER = lambda inp: [token.text for token in spacy_nlp(inp)]
             # spacy_nlp = get_module_or_attr("en_core_web_sm").load(disable=["ner", "lemmatizer"])
             # _SPACY_TAGGER = lambda inp: [token.tag for token in spacy_nlp(inp)]
