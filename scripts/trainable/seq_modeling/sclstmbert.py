@@ -17,7 +17,9 @@
 # 1. How to set multip-gpu in torch for training
 ############################################
 
-import os, sys
+import os
+import sys
+
 
 # export CUDA_VISIBLE_DEVICES=1,2 && echo $CUDA_VISIBLE_DEVICES
 # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
@@ -149,7 +151,7 @@ def model_predictions(model, data, vocab, DEVICE, BATCH_SIZE=16):
         # set batch data for others
         batch_labels_ids, batch_lengths = labelize(batch_labels, vocab)
         batch_idxs, batch_lengths_ = sclstm_tokenize(batch_sentences, vocab)
-        assert (batch_lengths_ == batch_lengths).all() == True
+        assert (batch_lengths_ == batch_lengths).all() is True
         assert len(batch_bert_splits) == len(batch_idxs)
         batch_idxs = [batch_idxs_.to(DEVICE) for batch_idxs_ in batch_idxs]
         batch_lengths = batch_lengths.to(DEVICE)
@@ -157,7 +159,8 @@ def model_predictions(model, data, vocab, DEVICE, BATCH_SIZE=16):
         # forward
         with torch.no_grad():
             """
-            NEW: batch_predictions can now be of shape (batch_size,batch_max_seq_len,topk) if topk>1, else (batch_size,batch_max_seq_len)
+            NEW: batch_predictions can now be of shape (batch_size,batch_max_seq_len,topk) if topk>1,
+                else (batch_size,batch_max_seq_len)
             """
             _, batch_predictions = model(
                 batch_idxs,
@@ -216,7 +219,7 @@ def model_inference(model, data, topk, DEVICE, BATCH_SIZE=16, vocab_=None):
         # set batch data for others
         batch_labels_ids, batch_lengths = labelize(batch_labels, vocab)
         batch_idxs, batch_lengths_ = sclstm_tokenize(batch_sentences, vocab)
-        assert (batch_lengths_ == batch_lengths).all() == True
+        assert (batch_lengths_ == batch_lengths).all() is True
         assert len(batch_bert_splits) == len(batch_idxs)
         batch_idxs = [batch_idxs_.to(DEVICE) for batch_idxs_ in batch_idxs]
         batch_lengths = batch_lengths.to(DEVICE)
@@ -225,7 +228,8 @@ def model_inference(model, data, topk, DEVICE, BATCH_SIZE=16, vocab_=None):
         try:
             with torch.no_grad():
                 """
-                NEW: batch_predictions can now be of shape (batch_size,batch_max_seq_len,topk) if topk>1, else (batch_size,batch_max_seq_len)
+                NEW: batch_predictions can now be of shape (batch_size,batch_max_seq_len,topk) if topk>1,
+                    else (batch_size,batch_max_seq_len)
                 """
                 batch_loss, batch_predictions = model(
                     batch_idxs,
@@ -237,7 +241,10 @@ def model_inference(model, data, topk, DEVICE, BATCH_SIZE=16, vocab_=None):
                 )
         except RuntimeError:
             print(
-                f"batch_idxs:{len(batch_idxs)},batch_lengths:{batch_lengths.shape},batch_bert_inp:{len(batch_bert_inp.keys())},batch_labels_ids:{batch_labels_ids.shape}"
+                (
+                    f"batch_idxs:{len(batch_idxs)},batch_lengths:{batch_lengths.shape},"
+                    f"batch_bert_inp:{len(batch_bert_inp.keys())},batch_labels_ids:{batch_labels_ids.shape}"
+                )
             )
             raise Exception("")
         valid_loss += batch_loss
@@ -280,8 +287,8 @@ def model_inference(model, data, topk, DEVICE, BATCH_SIZE=16, vocab_=None):
         """
         # update progress
         progressBar(batch_id+1,
-                    int(np.ceil(len(data) / VALID_BATCH_SIZE)), 
-                    ["batch_time","batch_loss","avg_batch_loss","batch_acc","avg_batch_acc"], 
+                    int(np.ceil(len(data) / VALID_BATCH_SIZE)),
+                    ["batch_time","batch_loss","avg_batch_loss","batch_acc","avg_batch_acc"],
                     [time.time()-st_time,batch_loss,valid_loss/(batch_id+1),None,None])
         """
     print(f"\nEpoch {None} valid_loss: {valid_loss/(batch_id+1)}")
@@ -301,7 +308,10 @@ def model_inference(model, data, topk, DEVICE, BATCH_SIZE=16, vocab_=None):
         )
     )
     print(
-        f"_corr2corr:{_corr2corr}, _corr2incorr:{_corr2incorr}, _incorr2corr:{_incorr2corr}, _incorr2incorr:{_incorr2incorr}"
+        (
+            f"_corr2corr:{_corr2corr}, _corr2incorr:{_corr2incorr}, _incorr2corr:{_incorr2corr}, "
+            f"_incorr2incorr:{_incorr2incorr}"
+        )
     )
     print(
         f"accuracy is {(_corr2corr+_incorr2corr)/(_corr2corr+_corr2incorr+_incorr2corr+_incorr2incorr)}"
@@ -444,8 +454,10 @@ if __name__ == "__main__":
         # << INCOMPLETE >>: See https://github.com/huggingface/transformers/blob/master/examples/run_glue.py for details
         # no_decay = ["bias", "LayerNorm.weight"]
         # optimizer_grouped_parameters = [
-        #     {"params": [p for n, p in model.named_parameters() if not any(nd in n for nd in no_decay)], "weight_decay": 0.0},
-        #     {"params": [p for n, p in model.named_parameters() if any(nd in n for nd in no_decay)], "weight_decay": 0.0},
+        #     {"params": [p for n, p in model.named_parameters() if not any(nd in n for nd in no_decay)],
+        #       "weight_decay": 0.0},
+        #     {"params": [p for n, p in model.named_parameters() if any(nd in n for nd in no_decay)],
+        #       "weight_decay": 0.0},
         # ]
         # optimizer = AdamW(optimizer_grouped_parameters, lr=args.learning_rate, eps=args.adam_epsilon)
         # scheduler = get_linear_schedule_with_warmup(
@@ -560,7 +572,7 @@ if __name__ == "__main__":
                 # set batch data for others
                 batch_labels, batch_lengths = labelize(batch_labels, vocab)
                 batch_idxs, batch_lengths_ = sclstm_tokenize(batch_sentences, vocab)
-                assert (batch_lengths_ == batch_lengths).all() == True
+                assert (batch_lengths_ == batch_lengths).all() is True
                 assert len(batch_bert_splits) == len(batch_idxs)
                 batch_idxs = [batch_idxs_.to(DEVICE) for batch_idxs_ in batch_idxs]
                 batch_lengths = batch_lengths.to(DEVICE)
@@ -627,7 +639,10 @@ if __name__ == "__main__":
                     nb = int(np.ceil(len(train_data) / TRAIN_BATCH_SIZE))
                     progress_write_file.write(f"{batch_id+1}/{nb}\n")
                     progress_write_file.write(
-                        f"batch_time: {time.time()-st_time}, avg_batch_loss: {train_loss/(batch_id+1)}, avg_batch_acc: {train_acc/(batch_id+1)}\n"
+                        (
+                            f"batch_time: {time.time()-st_time}, avg_batch_loss: {train_loss/(batch_id+1)}, "
+                            f"avg_batch_acc: {train_acc/(batch_id+1)}\n"
+                        )
                     )
                     progress_write_file.flush()
             print(f"\nEpoch {epoch_id} train_loss: {train_loss/(batch_id+1)}")
@@ -661,7 +676,7 @@ if __name__ == "__main__":
                 # set batch data for others
                 batch_labels, batch_lengths = labelize(batch_labels, vocab)
                 batch_idxs, batch_lengths_ = sclstm_tokenize(batch_sentences, vocab)
-                assert (batch_lengths_ == batch_lengths).all() == True
+                assert (batch_lengths_ == batch_lengths).all() is True
                 assert len(batch_bert_splits) == len(batch_idxs)
                 batch_idxs = [batch_idxs_.to(DEVICE) for batch_idxs_ in batch_idxs]
                 batch_lengths = batch_lengths.to(DEVICE)
@@ -709,7 +724,10 @@ if __name__ == "__main__":
                     nb = int(np.ceil(len(valid_data) / VALID_BATCH_SIZE))
                     progress_write_file.write(f"{batch_id}/{nb}\n")
                     progress_write_file.write(
-                        f"batch_time: {time.time()-st_time}, avg_batch_loss: {valid_loss/(batch_id+1)}, avg_batch_acc: {valid_acc/(batch_id+1)}\n"
+                        (
+                            f"batch_time: {time.time()-st_time}, avg_batch_loss: {valid_loss/(batch_id+1)}, "
+                            f"avg_batch_acc: {valid_acc/(batch_id+1)}\n"
+                        )
                     )
                     progress_write_file.flush()
             print(f"\nEpoch {epoch_id} valid_loss: {valid_loss/(batch_id+1)}")
@@ -719,7 +737,7 @@ if __name__ == "__main__":
 
                 # to file
                 # name = "model-epoch{}.pth.tar".format(epoch_id)
-                name = "model.pth.tar".format(epoch_id)
+                name = "model.pth.tar"  # .format(epoch_id)
                 torch.save(
                     {
                         "epoch_id": epoch_id,
@@ -751,9 +769,11 @@ if __name__ == "__main__":
         TRAIN_TEST_FILE_PATH1 = os.path.join(BASE_PATH, "traintest")
         TRAIN_TEST_FILE_PATH2 = os.path.join(BASE_PATH, "traintest/wo_context")
         """
-        paths = [TRAIN_TEST_FILE_PATH1,TRAIN_TEST_FILE_PATH1,TRAIN_TEST_FILE_PATH1,TRAIN_TEST_FILE_PATH2,TRAIN_TEST_FILE_PATH2,TRAIN_TEST_FILE_PATH2]
+        paths = [TRAIN_TEST_FILE_PATH1,TRAIN_TEST_FILE_PATH1,TRAIN_TEST_FILE_PATH1,TRAIN_TEST_FILE_PATH2,
+            TRAIN_TEST_FILE_PATH2,TRAIN_TEST_FILE_PATH2]
         files1 = ["test.bea60k","test.1blm","test.1blm","combined_data","aspell_big","aspell_small"]
-        files2 = ["test.bea60k.noise","test.1blm.noise.prob","test.1blm.noise.word","combined_data.noise","aspell_big.noise","aspell_small.noise"]
+        files2 = ["test.bea60k.noise","test.1blm.noise.prob","test.1blm.noise.word","combined_data.noise",
+            "aspell_big.noise","aspell_small.noise"]
         INFER_BATCH_SIZE = 16
         """
         """
@@ -837,19 +857,22 @@ if __name__ == "__main__":
         # # for better view
         # opfile = open(os.path.join(ANALYSIS_DIR,"greedy_results.txt"),'w')
         # for line in greedy_results:
-        #     ls = [(o,n,p) if o==n==p else ("**"+o+"**","**"+n+"**","**"+p+"**")for o,n,p in zip(line["original"].split(),line["noised"].split(),line["predicted"].split())]
+        #     ls = [(o,n,p) if o==n==p else ("**"+o+"**","**"+n+"**","**"+p+"**")for o,n,p in zip(line["original"]
+        #       .split(),line["noised"].split(),line["predicted"].split())]
         #     x,y,z = map(list, zip(*ls))
         #     opfile.write(f'{line["id"]}\n{" ".join(x)}\n{" ".join(y)}\n{" ".join(z)}\n')
         # opfile.close()
         # opfile = open(os.path.join(ANALYSIS_DIR,"greedy_results_corr_preds.txt"),'w')
         # for line in [line for line in greedy_results if line["original"]==line["predicted"]]:
-        #     ls = [(o,n,p) if o==n==p else ("**"+o+"**","**"+n+"**","**"+p+"**")for o,n,p in zip(line["original"].split(),line["noised"].split(),line["predicted"].split())]
+        #     ls = [(o,n,p) if o==n==p else ("**"+o+"**","**"+n+"**","**"+p+"**")for o,n,p in zip(line["original"]
+        #       .split(),line["noised"].split(),line["predicted"].split())]
         #     x,y,z = map(list, zip(*ls))
         #     opfile.write(f'{line["id"]}\n{" ".join(x)}\n{" ".join(y)}\n{" ".join(z)}\n')
         # opfile.close()
         # opfile = open(os.path.join(ANALYSIS_DIR,"greedy_results_incorr_preds.txt"),'w')
         # for line in [line for line in greedy_results if line["original"]!=line["predicted"]]:
-        #     ls = [(o,n,p) if o==n==p else ("**"+o+"**","**"+n+"**","**"+p+"**")for o,n,p in zip(line["original"].split(),line["noised"].split(),line["predicted"].split())]
+        #     ls = [(o,n,p) if o==n==p else ("**"+o+"**","**"+n+"**","**"+p+"**")for o,n,p in zip(line["original"]
+        #       .split(),line["noised"].split(),line["predicted"].split())]
         #     x,y,z = map(list, zip(*ls))
         #     opfile.write(f'{line["id"]}\n{" ".join(x)}\n{" ".join(y)}\n{" ".join(z)}\n')
         # opfile.close()

@@ -17,7 +17,9 @@
 # 1. How to set multip-gpu in torch for training
 ############################################
 
-import os, sys
+import os
+import sys
+
 
 # export CUDA_VISIBLE_DEVICES=1,2 && echo $CUDA_VISIBLE_DEVICES
 # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
@@ -26,7 +28,10 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/.")
 
 from tqdm import tqdm
-import os, sys
+import os
+import sys
+
+
 import numpy as np
 import re
 import time
@@ -125,7 +130,7 @@ def model_predictions(model, data, vocab, DEVICE, BATCH_SIZE=16):
         # set batch data
         batch_labels, batch_lengths = labelize(batch_clean_sentences, vocab)
         batch_idxs, batch_lengths_ = sclstm_tokenize(batch_corrupt_sentences, vocab)
-        assert (batch_lengths_ == batch_lengths).all() == True
+        assert (batch_lengths_ == batch_lengths).all() is True
         batch_idxs = [batch_idxs_.to(DEVICE) for batch_idxs_ in batch_idxs]
         batch_lengths = batch_lengths.to(DEVICE)
         batch_labels = batch_labels.to(DEVICE)
@@ -156,7 +161,8 @@ def model_inference(model, data, topk, DEVICE, BATCH_SIZE=16, vocab_=None):
     """
     if vocab_ is not None:
         vocab = vocab_
-    # list of dicts with keys {"id":, "original":, "noised":, "predicted":, "topk":, "topk_prediction_probs":, "topk_reranker_losses":,}
+    # list of dicts with keys {"id":, "original":, "noised":, "predicted":, "topk":,
+    #   "topk_prediction_probs":, "topk_reranker_losses":,}
     results = []
     line_index = 0
 
@@ -178,14 +184,15 @@ def model_inference(model, data, topk, DEVICE, BATCH_SIZE=16, vocab_=None):
         # set batch data
         batch_labels, batch_lengths = labelize(batch_clean_sentences, vocab)
         batch_idxs, batch_lengths_ = sclstm_tokenize(batch_corrupt_sentences, vocab)
-        assert (batch_lengths_ == batch_lengths).all() == True
+        assert (batch_lengths_ == batch_lengths).all() is True
         batch_idxs = [batch_idxs_.to(DEVICE) for batch_idxs_ in batch_idxs]
         batch_lengths = batch_lengths.to(DEVICE)
         batch_labels = batch_labels.to(DEVICE)
         # forward
         with torch.no_grad():
             """
-            NEW: batch_predictions can now be of shape (batch_size,batch_max_seq_len,topk) if topk>1, else (batch_size,batch_max_seq_len)
+            NEW: batch_predictions can now be of shape (batch_size,batch_max_seq_len,topk)
+                if topk>1, else (batch_size,batch_max_seq_len)
             """
             batch_loss, batch_predictions = model(
                 batch_idxs, batch_lengths, targets=batch_labels, topk=topk
@@ -243,8 +250,8 @@ def model_inference(model, data, topk, DEVICE, BATCH_SIZE=16, vocab_=None):
         """
         # update progress
         progressBar(batch_id+1,
-                    int(np.ceil(len(data) / VALID_BATCH_SIZE)), 
-                    ["batch_time","batch_loss","avg_batch_loss","batch_acc","avg_batch_acc"], 
+                    int(np.ceil(len(data) / VALID_BATCH_SIZE)),
+                    ["batch_time","batch_loss","avg_batch_loss","batch_acc","avg_batch_acc"],
                     [time.time()-st_time,batch_loss,valid_loss/(batch_id+1),None,None])
         """
     print(f"\nEpoch {None} valid_loss: {valid_loss/(batch_id+1)}")
@@ -264,7 +271,10 @@ def model_inference(model, data, topk, DEVICE, BATCH_SIZE=16, vocab_=None):
         )
     )
     print(
-        f"_corr2corr:{_corr2corr}, _corr2incorr:{_corr2incorr}, _incorr2corr:{_incorr2corr}, _incorr2incorr:{_incorr2incorr}"
+        (
+            f"_corr2corr:{_corr2corr}, _corr2incorr:{_corr2incorr}, _incorr2corr:{_incorr2corr}, "
+            f"_incorr2incorr:{_incorr2incorr}"
+        )
     )
     print(
         f"accuracy is {(_corr2corr+_incorr2corr)/(_corr2corr+_corr2incorr+_incorr2corr+_incorr2incorr)}"
@@ -605,7 +615,7 @@ if __name__ == "__main__":
                 # set batch data
                 batch_labels, batch_lengths = labelize(batch_labels, vocab)
                 batch_idxs, batch_lengths_ = sclstm_tokenize(batch_sentences, vocab)
-                assert (batch_lengths_ == batch_lengths).all() == True
+                assert (batch_lengths_ == batch_lengths).all() is True
                 batch_idxs = [batch_idxs_.to(DEVICE) for batch_idxs_ in batch_idxs]
                 batch_lengths = batch_lengths.to(DEVICE)
                 batch_labels = batch_labels.to(DEVICE)
@@ -666,7 +676,7 @@ if __name__ == "__main__":
                 # set batch data
                 batch_labels, batch_lengths = labelize(batch_labels, vocab)
                 batch_idxs, batch_lengths_ = sclstm_tokenize(batch_sentences, vocab)
-                assert (batch_lengths_ == batch_lengths).all() == True
+                assert (batch_lengths_ == batch_lengths).all() is True
                 batch_idxs = [batch_idxs_.to(DEVICE) for batch_idxs_ in batch_idxs]
                 batch_lengths = batch_lengths.to(DEVICE)
                 batch_labels = batch_labels.to(DEVICE)
@@ -744,9 +754,11 @@ if __name__ == "__main__":
         TRAIN_TEST_FILE_PATH1 = os.path.join(BASE_PATH, "traintest")
         TRAIN_TEST_FILE_PATH2 = os.path.join(BASE_PATH, "traintest/wo_context")
         """
-        paths = [TRAIN_TEST_FILE_PATH1,TRAIN_TEST_FILE_PATH1,TRAIN_TEST_FILE_PATH1,TRAIN_TEST_FILE_PATH2,TRAIN_TEST_FILE_PATH2,TRAIN_TEST_FILE_PATH2]
+        paths = [TRAIN_TEST_FILE_PATH1,TRAIN_TEST_FILE_PATH1,TRAIN_TEST_FILE_PATH1,TRAIN_TEST_FILE_PATH2,
+            TRAIN_TEST_FILE_PATH2,TRAIN_TEST_FILE_PATH2]
         files1 = ["test.bea60k","test.1blm","test.1blm","combined_data","aspell_big","aspell_small"]
-        files2 = ["test.bea60k.noise","test.1blm.noise.prob","test.1blm.noise.word","combined_data.noise","aspell_big.noise","aspell_small.noise"]
+        files2 = ["test.bea60k.noise","test.1blm.noise.prob","test.1blm.noise.word","combined_data.noise",
+            "aspell_big.noise","aspell_small.noise"]
         INFER_BATCH_SIZE = 16
         """
         """
