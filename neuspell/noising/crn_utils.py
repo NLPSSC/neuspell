@@ -37,11 +37,14 @@ def _get_keyboard_neighbor(ch):
                 for k in range(4):
                     x_, y_ = i + dx[k], j + dy[k]
                     if (x_ >= 0 and x_ < row) and (y_ >= 0 and y_ < col):
-                        if keyboard[x_][y_] == '*': continue
-                        if keyboard[i][j] == '*': continue
+                        if keyboard[x_][y_] == "*":
+                            continue
+                        if keyboard[i][j] == "*":
+                            continue
                         keyboard_mappings[keyboard[i][j]].append(keyboard[x_][y_])
 
-    if ch not in keyboard_mappings: return ch
+    if ch not in keyboard_mappings:
+        return ch
     return np.random.choice(keyboard_mappings[ch], 1)[0]
 
 
@@ -55,7 +58,7 @@ def _get_swap_word_representation(word):
     # rep = one_hot(word[0]) + bag_of_chars(word[1:-1]) + one_hot(word[-1])
     if len(word) > 3:
         idx = random.randint(1, len(word) - 3)
-        word = word[:idx] + word[idx + 1] + word[idx] + word[idx + 2:]
+        word = word[:idx] + word[idx + 1] + word[idx] + word[idx + 2 :]
 
     # return rep, word
     return word
@@ -65,7 +68,7 @@ def _get_drop_word_representation(word, prob=0.5):
     p = random.random()
     if len(word) >= 5 and p < prob:
         idx = random.randint(1, len(word) - 2)
-        word = word[:idx] + word[idx + 1:]
+        word = word[:idx] + word[idx + 1 :]
         # rep, _ = _get_swap_word_representation(word) # don't care about the returned word
         _ = _get_swap_word_representation(word)  # don't care about the returned word
     elif p > prob:
@@ -96,7 +99,7 @@ def _get_keyboard_word_representation(word):
     if len(word) >= 3:
         idx = random.randint(1, len(word) - 2)
         keyboard_neighbor = _get_keyboard_neighbor(word[idx])
-        word = word[:idx] + keyboard_neighbor + word[idx + 1:]
+        word = word[:idx] + keyboard_neighbor + word[idx + 1 :]
         # rep, _ = _get_swap_word_representation(word) # don't care about the returned word
         _ = _get_swap_word_representation(word)  # don't care about the returned word
     else:
@@ -110,15 +113,15 @@ def _get_line_representation(line, rep_list, probs):
     modified_words = []
     for word in line.split():
         rep_type = np.random.choice(rep_list, 1, p=probs)[0]
-        if 'swap' in rep_type:
+        if "swap" in rep_type:
             new_word = _get_swap_word_representation(word)
-        elif 'drop' in rep_type:
+        elif "drop" in rep_type:
             new_word = _get_drop_word_representation(word, 1.0)
-        elif 'add' in rep_type:
+        elif "add" in rep_type:
             new_word = _get_add_word_representation(word)
-        elif 'key' in rep_type:
+        elif "key" in rep_type:
             new_word = _get_keyboard_word_representation(word)
-        elif 'none' in rep_type or 'normal' in rep_type:
+        elif "none" in rep_type or "normal" in rep_type:
             new_word = word
         else:
             raise NotImplementedError
@@ -126,12 +129,16 @@ def _get_line_representation(line, rep_list, probs):
     return " ".join(modified_words)
 
 
-def get_line_representation(lines,
-                            rep_list=['swap', 'drop', 'add', 'key', 'none'],
-                            probs=[0.1, 0.1, 0.1, 0.1, 0.6],
-                            verbose=False):
+def get_line_representation(
+    lines,
+    rep_list=["swap", "drop", "add", "key", "none"],
+    probs=[0.1, 0.1, 0.1, 0.1, 0.6],
+    verbose=False,
+):
     if verbose:
-        print(f"the kinds of replacements and their probabilities are: {tuple(zip(rep_list, probs))}")
+        print(
+            f"the kinds of replacements and their probabilities are: {tuple(zip(rep_list, probs))}"
+        )
 
     modified_lines = []
     for line in tqdm(lines):
