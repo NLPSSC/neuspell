@@ -4,13 +4,13 @@ with open("README.md", mode="r", encoding="utf-8") as readme_file:
     readme = readme_file.read()
 
 requirements = [
-    'transformers',
-    'tqdm',
-    'torch>=1.6.0',
-    'numpy',
-    'jsonlines',
-    'sentencepiece',
-    'pytorch_pretrained_bert'
+    "transformers",
+    "tqdm",
+    "torch>=1.6.0",
+    "numpy",
+    "jsonlines",
+    "sentencepiece",
+    "pytorch_pretrained_bert",
 ]
 
 setup(
@@ -36,9 +36,9 @@ setup(
     install_requires=requirements,
     extras_require={
         "spacy": ["spacy"],
-        "elmo": ["allennlp==1.5.0"],
+        "elmo": ["allennlp>=2.0"],
         "noising": ["unidecode"],
-        "flask": ["flask_cors"]
+        "flask": ["flask_cors"],
     },
-    keywords="transformer networks neuspell neural spelling correction embedding PyTorch NLP deep learning"
+    keywords="transformer networks neuspell neural spelling correction embedding PyTorch NLP deep learning",
 )
