@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "neuspell"
+version = "1.0.0"
+description = "NeuSpell: A Neural Spelling Correction Toolkit"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "Sai Muralidhar Jayanthi" },
+    { name = "Danish Pruthi" },
+    { name = "Graham Neubig" },
+]
+maintainers = [
+    { name = "Sai Muralidhar Jayanthi", email = "jsaimurali001@gmail.com" },
+]
+keywords = [
+    "transformer networks",
+    "neuspell",
+    "neural spelling correction",
+    "embedding",
+    "PyTorch",
+    "NLP",
+    "deep learning",
+]
+requires-python = ">3.5"
+classifiers = [
+    "Natural Language :: English",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "License :: OSI Approved :: MIT License",
+]
+dependencies = [
+    "transformers",
+    "tqdm",
+    "torch>=1.6.0",
+    "numpy",
+    "jsonlines",
+    "sentencepiece",
+    "pytorch_pretrained_bert",
+]
+
+[project.optional-dependencies]
+spacy = ["spacy"]
+elmo = ["allennlp>=2.0"]
+noising = ["unidecode"]
+flask = ["flask_cors"]
+
+[tool.setuptools.packages.find]
+where = ["."]
