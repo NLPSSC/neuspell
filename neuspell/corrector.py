@@ -8,12 +8,13 @@ from .commons import DEFAULT_DATA_PATH
 from .seq_modeling.downloads import download_pretrained_model
 from .seq_modeling.helpers import load_vocab_dict, get_model_nparams
 from .util import is_module_available
+from .. import NAME_TO_CHECKER_MAPPINGS
 
 
 def get_size_of_model(model):
     torch.save(model.state_dict(), "temp.p")
     size = os.path.getsize("temp.p") / 1e6
-    os.remove('temp.p')
+    os.remove("temp.p")
     return size
 
 
@@ -27,10 +28,12 @@ class Corrector(ABC):
         "subwordbert-probwordnoise": f"{DEFAULT_DATA_PATH}/checkpoints/subwordbert-probwordnoise",
     }
     if is_module_available("allennlp"):
-        DEFAULT_CHECKPOINT_PATH.update({
-            "elmoscrnn-probwordnoise": f"{DEFAULT_DATA_PATH}/checkpoints/elmoscrnn-probwordnoise",
-            "scrnnelmo-probwordnoise": f"{DEFAULT_DATA_PATH}/checkpoints/scrnnelmo-probwordnoise",
-        })
+        DEFAULT_CHECKPOINT_PATH.update(
+            {
+                "elmoscrnn-probwordnoise": f"{DEFAULT_DATA_PATH}/checkpoints/elmoscrnn-probwordnoise",
+                "scrnnelmo-probwordnoise": f"{DEFAULT_DATA_PATH}/checkpoints/scrnnelmo-probwordnoise",
+            }
+        )
 
     # TODO: deprecated usage; should be reoved in next versions
     DEFAULT_CHECKERNAME_TO_NAME_MAPPING = {
@@ -42,16 +45,20 @@ class Corrector(ABC):
         "BertChecker": "subwordbert-probwordnoise",
     }
     if is_module_available("allennlp"):
-        DEFAULT_CHECKERNAME_TO_NAME_MAPPING.update({
-            "ElmosclstmChecker": "elmoscrnn-probwordnoise",
-            "SclstmelmoChecker": "scrnnelmo-probwordnoise",
-        })
+        DEFAULT_CHECKERNAME_TO_NAME_MAPPING.update(
+            {
+                "ElmosclstmChecker": "elmoscrnn-probwordnoise",
+                "SclstmelmoChecker": "scrnnelmo-probwordnoise",
+            }
+        )
 
     def __init__(self, **kwargs):
 
         self._default_name = kwargs.get("name", None)
         self.tokenize = kwargs.get("tokenize", True)
-        self.device = kwargs.get("device", "cuda" if torch.cuda.is_available() else "cpu")
+        self.device = kwargs.get(
+            "device", "cuda" if torch.cuda.is_available() else "cpu"
+        )
         self.device = "cuda" if self.device == "gpu" else self.device
 
         self.ckpt_path, self.vocab_path, self.weights_path = None, None, None
@@ -60,25 +67,35 @@ class Corrector(ABC):
         if not self._default_name:
 
             try:
-                self._default_name = Corrector.DEFAULT_CHECKERNAME_TO_NAME_MAPPING[self.__class__.__name__]
+                self._default_name = Corrector.DEFAULT_CHECKERNAME_TO_NAME_MAPPING[
+                    self.__class__.__name__
+                ]
             except KeyError as e:
-                msg = f"Unable to resolve checker name {self.__class__.__name__} " \
-                      f"from list of known names {[*NAME_TO_CHECKER_MAPPINGS.keys()]}"
+                msg = (
+                    f"Unable to resolve checker name {self.__class__.__name__} "
+                    f"from list of known names {[*NAME_TO_CHECKER_MAPPINGS.keys()]}"
+                )
                 raise ModuleNotFoundError(msg) from e
 
         if kwargs.get("pretrained", False):
             self.from_pretrained(ckpt_path=self.ckpt_path)
 
     def is_model_ready(self):
-        assert not (self.model is None or self.vocab is None), print("model & vocab must be loaded first")
+        assert not (self.model is None or self.vocab is None), print(
+            "model & vocab must be loaded first"
+        )
 
     @property
     def get_device(self):
         return self.device
 
-    def set_device(self, device='cpu'):
+    def set_device(self, device="cpu"):
         prev_device = self.device
-        device = "cuda" if ((device == "gpu" or device == "cuda") and torch.cuda.is_available()) else "cpu"
+        device = (
+            "cuda"
+            if ((device == "gpu" or device == "cuda") and torch.cuda.is_available())
+            else "cpu"
+        )
         if not (prev_device == device):
             # use .to() if moving from cpu or gpu, and for reverse, use map_location
             # https://tinyurl.com/y57pcjvd
@@ -90,8 +107,10 @@ class Corrector(ABC):
                     try:
                         self.from_pretrained(self.ckpt_path, vocab=self.vocab_path)
                     except Exception as e:
-                        msg = f"Unable to move model from {prev_device} to {device}. " \
-                              f"Please load a new instance with argument `device={device}. "
+                        msg = (
+                            f"Unable to move model from {prev_device} to {device}. "
+                            f"Please load a new instance with argument `device={device}. "
+                        )
                         raise Exception(msg)
             self.device = device
             print(f"model set to work on {device}")
@@ -109,10 +128,10 @@ class Corrector(ABC):
 
     def correct_from_file(self, src, dest="./clean_version.txt"):
         self.is_model_ready()
-        x = [line.strip() for line in open(src, 'r')]
+        x = [line.strip() for line in open(src, "r")]
         y = self.correct_strings(x)
         print(f"saving results at: {dest}")
-        opfile = open(dest, 'w')
+        opfile = open(dest, "w")
         for line in y:
             opfile.write(line + "\n")
         opfile.close()

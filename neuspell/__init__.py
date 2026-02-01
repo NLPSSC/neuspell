@@ -1,8 +1,8 @@
 __version__ = "1.0.0"
-__author__ = 'Sai Muralidhar Jayanthi, Danish Pruthi, and Graham Neubig'
+__author__ = "Sai Muralidhar Jayanthi, Danish Pruthi, and Graham Neubig"
 __email__ = "jsaimurali001@gmail.com"
 
-from . import seq_modeling
+# from . import seq_modeling
 from . import off_the_shelf
 from .corrector_bertsclstm import BertsclstmChecker
 from .corrector_cnnlstm import CnnlstmChecker
@@ -10,7 +10,8 @@ from .corrector_lstmlstm import NestedlstmChecker
 from .corrector_sclstm import SclstmChecker
 from .corrector_sclstmbert import SclstmbertChecker
 from .corrector_subwordbert import BertChecker
-from .off_the_shelf import *
+
+# from .off_the_shelf import *
 from .util import is_module_available
 
 __all__ = []
@@ -28,7 +29,7 @@ if is_module_available("allennlp"):
         "SclstmChecker",
         "SclstmbertChecker",
         "SclstmelmoChecker",
-        "BertChecker"
+        "BertChecker",
     ]
 
 else:
@@ -38,7 +39,7 @@ else:
         "NestedlstmChecker",
         "SclstmChecker",
         "SclstmbertChecker",
-        "BertChecker"
+        "BertChecker",
     ]
 
 __all__checkers.extend(off_the_shelf.__all__)
@@ -56,19 +57,22 @@ class CheckersFactory:
         "lstm-lstm-probwordnoise": NestedlstmChecker,
         "scrnn-probwordnoise": SclstmChecker,
         "scrnnbert-probwordnoise": SclstmbertChecker,
-        "subwordbert-probwordnoise": BertChecker
+        "subwordbert-probwordnoise": BertChecker,
     }
 
     if is_module_available("allennlp"):
-        NAME_TO_CHECKER_MAPPINGS.update({
-            "elmoscrnn-probwordnoise": ElmosclstmChecker,
-            "scrnnelmo-probwordnoise": SclstmelmoChecker,
-        })
+        NAME_TO_CHECKER_MAPPINGS.update(
+            {
+                "elmoscrnn-probwordnoise": ElmosclstmChecker,
+                "scrnnelmo-probwordnoise": SclstmelmoChecker,
+            }
+        )
 
     @staticmethod
     def from_pretrained(name_or_path, **kwargs):
 
         import os
+
         if os.path.exists(name_or_path):
             # name = os.path.split(name_or_path)[-1]
             msg = "To load a model from a path, directy use checker name as XxxChecker instead of using CheckersFactory"
@@ -81,8 +85,10 @@ class CheckersFactory:
             checker.from_pretrained()
             return checker
         except KeyError as e:
-            msg = f"Found checker name: {name_or_path}. " \
-                  f"Expected a checker name in {[*CheckersFactory.NAME_TO_CHECKER_MAPPINGS.keys()]}"
+            msg = (
+                f"Found checker name: {name_or_path}. "
+                f"Expected a checker name in {[*CheckersFactory.NAME_TO_CHECKER_MAPPINGS.keys()]}"
+            )
             raise Exception(msg) from e
 
 
