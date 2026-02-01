@@ -18,13 +18,13 @@ class JamspellChecker:
     def __init__(self, tokenize=True):
         self.tokenize = tokenize
         self.model = jamspell.TSpellCorrector()
-        self.model.LoadLangModel('en.bin')
+        self.model.LoadLangModel("en.bin")
 
     def from_pretrained(self, ckpt_path, vocab="", weights=""):
         return
 
-    def set_device(self, device='cpu'):
-        print(f"model set to work on cpu")
+    def set_device(self, device="cpu"):
+        print("model set to work on cpu")
         return
 
     def correct_strings(self, mystrings: List[str], return_all=False) -> List[str]:
@@ -52,16 +52,30 @@ class JamspellChecker:
             inference_st_time = time()
             predictions_data = self.correct_strings(corrupt_data)
             assert len(clean_data) == len(corrupt_data) == len(predictions_data)
-            corr2corr, corr2incorr, incorr2corr, incorr2incorr = \
-                get_metrics(clean_data, corrupt_data, predictions_data)
+            corr2corr, corr2incorr, incorr2corr, incorr2incorr = get_metrics(
+                clean_data, corrupt_data, predictions_data
+            )
 
-            print("total inference time for this data is: {:4f} secs".format(time() - inference_st_time))
-            print("###############################################")
-            print("total token count: {}".format(corr2corr + corr2incorr + incorr2corr + incorr2incorr))
             print(
-                f"corr2corr:{corr2corr}, corr2incorr:{corr2incorr}, incorr2corr:{incorr2corr}, incorr2incorr:{incorr2incorr}")
-            print(f"accuracy is {(corr2corr + incorr2corr) / (corr2corr + corr2incorr + incorr2corr + incorr2incorr)}")
-            print(f"word correction rate is {(incorr2corr) / (incorr2corr + incorr2incorr)}")
+                "total inference time for this data is: {:4f} secs".format(
+                    time() - inference_st_time
+                )
+            )
+            print("###############################################")
+            print(
+                "total token count: {}".format(
+                    corr2corr + corr2incorr + incorr2corr + incorr2incorr
+                )
+            )
+            print(
+                f"corr2corr:{corr2corr}, corr2incorr:{corr2incorr}, incorr2corr:{incorr2corr}, incorr2incorr:{incorr2incorr}"
+            )
+            print(
+                f"accuracy is {(corr2corr + incorr2corr) / (corr2corr + corr2incorr + incorr2corr + incorr2incorr)}"
+            )
+            print(
+                f"word correction rate is {(incorr2corr) / (incorr2corr + incorr2incorr)}"
+            )
             print("###############################################")
 
         return
