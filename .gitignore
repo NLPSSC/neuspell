@@ -140,4 +140,5 @@ applications/
 #!README.mdenvs/ 
 
 envs/
-extracted_notes.7z
+extracted_notes/
+extracted_notes.7z.*
