@@ -1,5 +1,3 @@
-from neuspell.seq_modeling.helpers import sclstm_tokenize
-from neuspell.seq_modeling.helpers import bert_tokenize_for_valid_examples
 import os
 import time
 import tqdm
@@ -14,6 +12,8 @@ from .helpers import (
 from .models import BertSCLSTM
 from .downloads import download_pretrained_model
 from .evals import get_metrics
+from neuspell.seq_modeling.helpers import sclstm_tokenize
+from neuspell.seq_modeling.helpers import bert_tokenize_for_valid_examples
 
 
 def load_model(vocab, verbose=False):
