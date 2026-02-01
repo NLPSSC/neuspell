@@ -31,11 +31,13 @@ from .seq_modeling.helpers import load_data
 
 
 class AspellChecker:
-    
+
     def __init__(self, tokenize=True):
         self.tokenize = tokenize
         self.model = aspell.Speller()
-        self.model.setConfigKey('sug-mode', "normal")  # ultra, fast, normal, slow, or bad-spellers
+        self.model.setConfigKey(
+            "sug-mode", "normal"
+        )  # ultra, fast, normal, slow, or bad-spellers
 
     def correct_strings(self, mystrings: List[str], return_all=False) -> List[str]:
         if self.tokenize:
@@ -70,19 +72,37 @@ class AspellChecker:
             inference_st_time = time()
             predictions_data = self.correct_strings(corrupt_data)
             assert len(clean_data) == len(corrupt_data) == len(predictions_data)
-            corr2corr, corr2incorr, incorr2corr, incorr2incorr = \
-                get_metrics(clean_data, corrupt_data, predictions_data)
+            corr2corr, corr2incorr, incorr2corr, incorr2incorr = get_metrics(
+                clean_data, corrupt_data, predictions_data
+            )
 
-            print("total inference time for this data is: {:4f} secs".format(time() - inference_st_time))
-            print("###############################################")
-            print("total token count: {}".format(corr2corr + corr2incorr + incorr2corr + incorr2incorr))
             print(
-                f"corr2corr:{corr2corr}, corr2incorr:{corr2incorr}, incorr2corr:{incorr2corr}, incorr2incorr:{incorr2incorr}")
-            print(f"accuracy is {(corr2corr + incorr2corr) / (corr2corr + corr2incorr + incorr2corr + incorr2incorr)}")
-            print(f"word correction rate is {(incorr2corr) / (incorr2corr + incorr2incorr)}")
+                "total inference time for this data is: {:4f} secs".format(
+                    time() - inference_st_time
+                )
+            )
+            print("###############################################")
+            print(
+                "total token count: {}".format(
+                    corr2corr + corr2incorr + incorr2corr + incorr2incorr
+                )
+            )
+            print(
+                (
+                    f"corr2corr:{corr2corr}, corr2incorr:{corr2incorr}, incorr2corr:{incorr2corr}, "
+                    f"incorr2incorr:{incorr2incorr}"
+                )
+            )
+            print(
+                f"accuracy is {(corr2corr + incorr2corr) / (corr2corr + corr2incorr + incorr2corr + incorr2incorr)}"
+            )
+            print(
+                f"word correction rate is {(incorr2corr) / (incorr2corr + incorr2incorr)}"
+            )
             print("###############################################")
 
         return
+
 
 # if __name__ == "__main__":
 #
