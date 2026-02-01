@@ -137,4 +137,6 @@ wordunits/
 applications/
 
 # Do not ignore these
-#!README.md
+#!README.mdenvs/ 
+
+envs/
