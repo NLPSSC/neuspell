@@ -4,11 +4,13 @@ from typing import List
 
 import torch
 
+from neuspell.neuspell import CheckersFactory
+
 from .commons import DEFAULT_DATA_PATH
 from .seq_modeling.downloads import download_pretrained_model
 from .seq_modeling.helpers import load_vocab_dict, get_model_nparams
 from .util import is_module_available
-from .. import NAME_TO_CHECKER_MAPPINGS
+
 
 
 def get_size_of_model(model):
@@ -73,7 +75,7 @@ class Corrector(ABC):
             except KeyError as e:
                 msg = (
                     f"Unable to resolve checker name {self.__class__.__name__} "
-                    f"from list of known names {[*NAME_TO_CHECKER_MAPPINGS.keys()]}"
+                    f"from list of known names {[*CheckersFactory.NAME_TO_CHECKER_MAPPINGS.keys()]}"
                 )
                 raise ModuleNotFoundError(msg) from e
 
